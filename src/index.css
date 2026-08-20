@@ -1,1 +1,199 @@
 @import "tailwindcss";
+
+@theme {
+  --font-display: "Unbounded", "Golos Text", sans-serif;
+  --font-sans: "Golos Text", "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --color-pine-950: #0a1e18;
+  --color-pine-900: #113026;
+  --color-pine-850: #16382c;
+  --color-pine-800: #1b4434;
+  --color-pine-700: #245743;
+  --color-pine-600: #2f6b52;
+
+  --color-mist-50: #f6f9f4;
+  --color-mist-100: #edf2ea;
+  --color-mist-200: #dfe8da;
+  --color-mist-300: #c9d6c4;
+  --color-mist-400: #a9bda2;
+
+  --color-ink-900: #17251d;
+  --color-ink-700: #33463b;
+  --color-ink-500: #5d7265;
+  --color-ink-400: #7c9184;
+
+  --color-leaf-700: #187a44;
+  --color-leaf-600: #1f9253;
+  --color-leaf-500: #2aa763;
+  --color-leaf-400: #4cbe7e;
+  --color-leaf-100: #dcf1e4;
+
+  --color-st-new: #f26a1f;
+  --color-st-new-soft: #fde6d6;
+  --color-st-work: #2f74e0;
+  --color-st-work-soft: #dee9fc;
+  --color-st-done: #23a05a;
+  --color-st-done-soft: #dcf1e4;
+  --color-st-rej: #87948b;
+  --color-st-rej-soft: #e9ede9;
+
+  --color-amber: #e39b12;
+  --color-amber-soft: #f8ecd2;
+  --color-amber-deep: #9c6c08;
+
+  --color-danger: #c04a3a;
+  --color-danger-soft: #fae7e2;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-mist-100);
+  color: var(--color-ink-900);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-leaf-500) 30%, transparent);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-mist-300) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-mist-300);
+  border-radius: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ---------- keyframes ---------- */
+
+@keyframes pulseRing {
+  0% { transform: scale(0.55); opacity: 0.85; }
+  75% { transform: scale(2.15); opacity: 0; }
+  100% { transform: scale(2.15); opacity: 0; }
+}
+@keyframes tickerMove {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes slideInRight {
+  from { transform: translateX(102%); }
+  to { transform: none; }
+}
+@keyframes slideInLeft {
+  from { transform: translateX(-102%); }
+  to { transform: none; }
+}
+.anim-drawer-left {
+  animation: slideInLeft 0.3s cubic-bezier(0.25, 0.9, 0.3, 1) both;
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.94) translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes dashMove {
+  to { stroke-dashoffset: -260; }
+}
+@keyframes blinkDot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+@keyframes growW {
+  from { width: 0; }
+}
+
+.reveal {
+  animation: fadeUp 0.55s cubic-bezier(0.22, 0.9, 0.3, 1) both;
+}
+.anim-pop {
+  animation: popIn 0.32s cubic-bezier(0.22, 0.9, 0.3, 1) both;
+}
+.anim-drawer {
+  animation: slideInRight 0.34s cubic-bezier(0.25, 0.9, 0.3, 1) both;
+}
+.anim-toast {
+  animation: toastIn 0.3s cubic-bezier(0.22, 0.9, 0.3, 1) both;
+}
+.anim-grow {
+  animation: growW 0.8s cubic-bezier(0.22, 0.9, 0.3, 1) both;
+}
+.live-dot {
+  animation: blinkDot 1.6s ease-in-out infinite;
+}
+
+.ticker-track {
+  animation: tickerMove 38s linear infinite;
+}
+.ticker-wrap:hover .ticker-track {
+  animation-play-state: paused;
+}
+
+/* ---------- map ---------- */
+
+.mk {
+  cursor: pointer;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.18s ease;
+}
+.mk:hover {
+  transform: scale(1.22);
+}
+.mk-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pulseRing 1.9s ease-out infinite;
+  pointer-events: none;
+}
+.route {
+  stroke-dasharray: 2 9;
+  animation: dashMove 16s linear infinite;
+}
+.addmode {
+  cursor: crosshair;
+}
+.map-label {
+  font-family: var(--font-mono);
+  fill: #8ba184;
+  letter-spacing: 0.16em;
+  pointer-events: none;
+  user-select: none;
+}
+.district-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  fill: #a2b69b;
+  letter-spacing: 0.3em;
+  pointer-events: none;
+  user-select: none;
+}
+.water-label {
+  font-family: var(--font-mono);
+  font-style: italic;
+  fill: #6f9fb0;
+  letter-spacing: 0.2em;
+  pointer-events: none;
+  user-select: none;
+}
