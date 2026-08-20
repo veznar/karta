@@ -224,3 +224,13 @@ export function CategoryGlyph({
 export function categoryPaths(id: CategoryId): React.ReactNode {
   return CAT[id];
 }
+
+/* SVG-разметка глифов строкой — для HTML-маркеров Leaflet (divIcon) */
+export const CATEGORY_SVG_INNER: Record<CategoryId, string> = {
+  house: `<path d="M7.2 9.2 6 19.4A1.7 1.7 0 0 0 7.7 21h8.6a1.7 1.7 0 0 0 1.7-1.6L16.8 9.2"/><path d="M9.5 9 8.4 5.6 10 3l2 2 2-2 1.6 2.6L14.5 9"/><path d="M9 13.5c1 .8 2 1.2 3 1.2s2-.4 3-1.2"/>`,
+  construction: `<path d="M3 8h18v4H3zM3 12h18v4H3z"/><path d="M9 8v4M15 8v4M6 12v4M12 12v4M18 12v4"/>`,
+  tires: `<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2M6.4 6.4l1.4 1.4M16.2 16.2l1.4 1.4M17.6 6.4l-1.4 1.4M7.8 16.2l-1.4 1.4"/>`,
+  hazard: `<path d="M12 3.5 2.5 20h19z"/><path d="M12 9.5V14"/><circle cx="12" cy="17" r="0.4" fill="currentColor"/>`,
+  green: `<path d="M4 20C8 14 12 10 19 5"/><path d="M19 5c-3.2 0-5.2 2-5.2 5.2C17 10.2 19 8.2 19 5z"/><path d="M11.5 12.5c-2.6 0-4.2 1.6-4.2 4.2 2.6 0 4.2-1.6 4.2-4.2z"/>`,
+  other: `<path d="M3.5 8 12 3.5 20.5 8v8L12 20.5 3.5 16z"/><path d="M3.5 8 12 12.5 20.5 8M12 12.5v8"/>`,
+};
