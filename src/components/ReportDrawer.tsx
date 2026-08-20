@@ -185,6 +185,22 @@ export default function ReportDrawer({
                 <div className="mt-0.5 text-[13px] font-semibold text-ink-900">{r.author}</div>
               </div>
               <div className="col-span-2">
+                <div className="font-mono text-[9px] font-bold tracking-[0.16em] text-ink-400">КООРДИНАТЫ · OPENSTREETMAP</div>
+                <div className="mt-0.5 flex flex-wrap items-center gap-2">
+                  <span className="font-mono text-[12px] font-bold text-ink-900">
+                    {r.lat.toFixed(5)}, {r.lng.toFixed(5)}
+                  </span>
+                  <a
+                    href={`https://www.openstreetmap.org/?mlat=${r.lat}&mlon=${r.lng}#map=17/${r.lat}/${r.lng}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-1 rounded-md bg-mist-100 px-1.5 py-0.5 text-[10.5px] font-bold text-leaf-700 transition-colors hover:bg-leaf-100"
+                  >
+                    открыть в OSM <Icon name="arrowRight" className="w-3 h-3" />
+                  </a>
+                </div>
+              </div>
+              <div className="col-span-2">
                 <div className="font-mono text-[9px] font-bold tracking-[0.16em] text-ink-400">ИСПОЛНИТЕЛЬ</div>
                 <div className="mt-0.5 flex items-center gap-1.5 text-[13px] font-semibold text-ink-900">
                   {r.assignee ? (

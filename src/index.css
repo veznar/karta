@@ -150,50 +150,156 @@ body {
   animation-play-state: paused;
 }
 
-/* ---------- map ---------- */
+/* ---------- leaflet / openstreetmap ---------- */
 
-.mk {
-  cursor: pointer;
-  transform-box: fill-box;
-  transform-origin: center;
+.leaflet-container {
+  font-family: var(--font-sans);
+  background: #e8eee4;
+  outline: none;
+}
+.leaflet-container.addmode-map {
+  cursor: crosshair !important;
+}
+.leaflet-bar {
+  border: 1px solid var(--color-mist-300) !important;
+  box-shadow: 0 10px 24px rgba(23, 37, 29, 0.16) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+.leaflet-bar a {
+  width: 34px !important;
+  height: 34px !important;
+  line-height: 34px !important;
+  color: var(--color-ink-700) !important;
+  background: #ffffff !important;
+  border-bottom: 1px solid var(--color-mist-200) !important;
+  font-weight: 700;
+}
+.leaflet-bar a:hover {
+  background: var(--color-mist-100) !important;
+  color: var(--color-ink-900) !important;
+}
+.leaflet-bar a.leaflet-disabled {
+  color: var(--color-mist-400) !important;
+}
+.leaflet-control-attribution {
+  font-family: var(--font-mono);
+  font-size: 9px !important;
+  background: rgba(255, 255, 255, 0.82) !important;
+  color: #5d7265 !important;
+}
+.leaflet-control-attribution a {
+  color: #2f6b52 !important;
+}
+.leaflet-control-scale-line {
+  font-family: var(--font-mono);
+  font-size: 9px !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+  border-color: #7c9184 !important;
+  color: #33463b !important;
+}
+
+/* маркеры свалок */
+.cg-marker {
+  background: transparent;
+  border: none;
+}
+.mk-wrap {
+  position: relative;
+  display: block;
+  width: 28px;
+  height: 28px;
+}
+.mk-dot {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 2.5px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(23, 37, 29, 0.4);
   transition: transform 0.18s ease;
 }
-.mk:hover {
-  transform: scale(1.22);
+.leaflet-marker-icon:hover .mk-dot {
+  transform: scale(1.18);
 }
-.mk-pulse {
-  transform-box: fill-box;
-  transform-origin: center;
+.mk-dot-sel {
+  box-shadow:
+    0 0 0 3px rgba(23, 37, 29, 0.16),
+    0 3px 10px rgba(23, 37, 29, 0.45);
+}
+.mk-pulse-ring {
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
   animation: pulseRing 1.9s ease-out infinite;
   pointer-events: none;
 }
-.route {
-  stroke-dasharray: 2 9;
-  animation: dashMove 16s linear infinite;
-}
-.addmode {
-  cursor: crosshair;
-}
-.map-label {
-  font-family: var(--font-mono);
-  fill: #8ba184;
-  letter-spacing: 0.16em;
+.mk-sel-ring {
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  border: 2px dashed;
+  animation: spinSlow 10s linear infinite;
   pointer-events: none;
-  user-select: none;
 }
-.district-label {
+@keyframes spinSlow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.district-label-map {
   font-family: var(--font-display);
   font-weight: 700;
-  fill: #a2b69b;
-  letter-spacing: 0.3em;
-  pointer-events: none;
-  user-select: none;
+  font-size: 10.5px;
+  letter-spacing: 0.26em;
+  color: rgba(46, 74, 58, 0.72);
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9),
+    0 -1px 0 rgba(255, 255, 255, 0.9),
+    1px 0 0 rgba(255, 255, 255, 0.9),
+    -1px 0 0 rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
 }
-.water-label {
+
+/* тултип маркера */
+.cg-tip {
+  background: #0a1e18 !important;
+  border: 1px solid #245743 !important;
+  border-radius: 8px !important;
+  padding: 7px 10px !important;
+  box-shadow: 0 10px 26px rgba(10, 30, 24, 0.4) !important;
+  color: #f6f9f4;
+}
+.leaflet-tooltip-top.cg-tip::before {
+  border-top-color: #245743 !important;
+}
+.tip-num {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-family: var(--font-mono);
-  font-style: italic;
-  fill: #6f9fb0;
-  letter-spacing: 0.2em;
-  pointer-events: none;
-  user-select: none;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #4cbe7e;
+}
+.tip-title {
+  margin-top: 2px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.tip-addr {
+  font-size: 10.5px;
+  color: #c9d6c4;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* маршрут патруля */
+.leaflet-overlay-pane path.cg-route {
+  animation: dashMove 16s linear infinite;
 }

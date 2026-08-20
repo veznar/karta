@@ -26,7 +26,7 @@ import ReportDrawer from "./components/ReportDrawer";
 import NewReportModal from "./components/NewReportModal";
 import Toasts from "./components/Toasts";
 
-const LS_REPORTS = "chistograd.reports.v1";
+const LS_REPORTS = "chistograd.reports.v2";
 const LS_ROLE = "chistograd.role.v1";
 
 function loadReports(): Report[] {
@@ -34,7 +34,12 @@ function loadReports(): Report[] {
     const raw = localStorage.getItem(LS_REPORTS);
     if (raw) {
       const parsed = JSON.parse(raw) as Report[];
-      if (Array.isArray(parsed) && parsed.length) return parsed;
+      if (
+        Array.isArray(parsed) &&
+        parsed.length &&
+        parsed.every((r) => typeof r.lat === "number" && typeof r.lng === "number")
+      )
+        return parsed;
     }
   } catch {
     /* ignore */
@@ -60,7 +65,7 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [addMode, setAddMode] = useState(false);
-  const [pendingPoint, setPendingPoint] = useState<{ x: number; y: number } | null>(null);
+  const [pendingPoint, setPendingPoint] = useState<{ lat: number; lng: number } | null>(null);
   const [filters, setFilters] = useState<Filters>({ ...DEFAULT_FILTERS });
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
@@ -116,9 +121,9 @@ export default function App() {
     const rep: Report = {
       id: "r" + num,
       num,
-      x: pendingPoint.x,
-      y: pendingPoint.y,
-      district: nearestDistrict(pendingPoint.x, pendingPoint.y),
+      lat: pendingPoint.lat,
+      lng: pendingPoint.lng,
+      district: nearestDistrict(pendingPoint.lat, pendingPoint.lng),
       address: d.address,
       category: d.category,
       description: d.description,
@@ -339,8 +344,8 @@ export default function App() {
               selectedId={selectedId}
               onSelect={setSelectedId}
               addMode={addMode}
-              onPickPoint={(x, y) => {
-                setPendingPoint({ x, y });
+              onPickPoint={(lat, lng) => {
+                setPendingPoint({ lat, lng });
                 setAddMode(false);
               }}
               filters={filters}
@@ -377,9 +382,9 @@ export default function App() {
 
       {pendingPoint && (
         <NewReportModal
-          x={pendingPoint.x}
-          y={pendingPoint.y}
-          district={nearestDistrict(pendingPoint.x, pendingPoint.y)}
+          lat={pendingPoint.lat}
+          lng={pendingPoint.lng}
+          district={nearestDistrict(pendingPoint.lat, pendingPoint.lng)}
           nextNum={nextNum}
           onClose={() => setPendingPoint(null)}
           onSubmit={addReport}

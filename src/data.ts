@@ -49,12 +49,36 @@ export const STATUS_META: Record<
   rejected: { label: "Отклонена", color: "#87948b", soft: "#e9ede9", text: "#5c685f" },
 };
 
-export const DISTRICTS: { name: string; cx: number; cy: number; lx: number; ly: number }[] = [
-  { name: "Заводской", cx: 210, cy: 260, lx: 132, ly: 118 },
-  { name: "Северный", cx: 450, cy: 170, lx: 318, ly: 182 },
-  { name: "Центральный", cx: 440, cy: 400, lx: 328, ly: 370 },
-  { name: "Заречный", cx: 810, cy: 300, lx: 762, ly: 168 },
-  { name: "Южный", cx: 350, cy: 545, lx: 292, ly: 505 },
+/* ---------- география (демо-полигон — Казань, данные © OpenStreetMap) ---------- */
+
+export const CITY_CENTER: [number, number] = [55.797, 49.124];
+export const CITY_ZOOM = 12;
+export const CITY_NAME = "Казань";
+
+export const DISTRICTS: { name: string; lat: number; lng: number }[] = [
+  { name: "Вахитовский", lat: 55.787, lng: 49.124 },
+  { name: "Ново-Савиновский", lat: 55.82, lng: 49.125 },
+  { name: "Московский", lat: 55.843, lng: 49.09 },
+  { name: "Кировский", lat: 55.848, lng: 49.028 },
+  { name: "Приволжский", lat: 55.744, lng: 49.158 },
+  { name: "Советский", lat: 55.795, lng: 49.19 },
+];
+
+/* маршруты патрулей экоконтроля */
+export const ROUTE_LINES: [number, number][][] = [
+  [
+    [55.8125, 49.102],
+    [55.8065, 49.118],
+    [55.7965, 49.1235],
+    [55.7875, 49.13],
+    [55.7805, 49.145],
+  ],
+  [
+    [55.76, 49.11],
+    [55.749, 49.13],
+    [55.741, 49.15],
+    [55.726, 49.168],
+  ],
 ];
 
 export const ORGANIZATIONS = [
@@ -92,32 +116,6 @@ export const DEFAULT_FILTERS: Filters = {
   categories: CATEGORIES.map((c) => c.id),
   district: "all",
 };
-
-/* ---------- геометрия города (viewBox 1000×640) ---------- */
-
-export const BUILDINGS: [number, number, number, number][] = [
-  [120, 230, 34, 20], [162, 208, 26, 26], [108, 330, 40, 18], [170, 350, 30, 22],
-  [128, 178, 24, 24], [222, 300, 36, 16], [80, 262, 28, 20], [228, 232, 24, 18],
-  [382, 148, 26, 18], [424, 182, 30, 16], [474, 138, 22, 22], [512, 172, 26, 14],
-  [360, 222, 34, 18], [452, 232, 24, 20], [540, 212, 28, 16], [500, 232, 22, 14],
-  [380, 336, 30, 20], [432, 318, 24, 24], [486, 340, 34, 18], [356, 452, 28, 16],
-  [420, 468, 32, 20], [502, 300, 20, 26], [560, 418, 22, 16], [318, 398, 26, 18],
-  [242, 520, 30, 16], [302, 560, 26, 20], [382, 588, 34, 18], [180, 540, 24, 20],
-  [422, 540, 26, 16], [470, 580, 28, 14],
-  [800, 248, 28, 18], [842, 330, 30, 16], [882, 268, 22, 22], [820, 392, 26, 18],
-  [902, 350, 30, 16], [862, 202, 24, 18], [782, 442, 28, 16], [912, 452, 24, 18],
-];
-
-export const TREES: [number, number][] = [
-  [470, 490], [502, 512], [532, 480], [562, 505], [455, 522], [585, 528], [516, 536],
-  [330, 82], [372, 112], [412, 70], [452, 100], [502, 82], [540, 120], [362, 140], [482, 142],
-  [872, 416], [896, 432], [858, 442],
-];
-
-export const ROUTES: string[] = [
-  "40,430 470,430 470,300 690,300 840,300 840,452",
-  "190,560 190,210 470,210 470,118",
-];
 
 /* ---------- помощники ---------- */
 
@@ -158,11 +156,14 @@ export function fmtDay(ts: number) {
   return `${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
-export function nearestDistrict(x: number, y: number) {
+export function nearestDistrict(lat: number, lng: number) {
+  const kx = Math.cos((lat * Math.PI) / 180);
   let best = DISTRICTS[0];
   let bd = Infinity;
   for (const d of DISTRICTS) {
-    const dist = (d.cx - x) ** 2 + (d.cy - y) ** 2;
+    const dx = (d.lng - lng) * kx;
+    const dy = d.lat - lat;
+    const dist = dx * dx + dy * dy;
     if (dist < bd) {
       bd = dist;
       best = d;
@@ -188,7 +189,8 @@ const cm = (ts: number, author: string, role: Role, text: string): CommentT => (
 
 interface SeedOpts {
   num: number;
-  x: number; y: number;
+  lat: number;
+  lng: number;
   address: string;
   category: CategoryId;
   description: string;
@@ -207,7 +209,7 @@ interface SeedOpts {
 }
 
 function mk(o: SeedOpts): Report {
-  const district = nearestDistrict(o.x, o.y);
+  const district = nearestDistrict(o.lat, o.lng);
   const timeline: TimelineEvent[] = [
     ev(o.createdAt, "created", "Заявка зарегистрирована жителем", o.author),
   ];
@@ -222,8 +224,8 @@ function mk(o: SeedOpts): Report {
   return {
     id: "r" + o.num,
     num: o.num,
-    x: o.x,
-    y: o.y,
+    lat: o.lat,
+    lng: o.lng,
     district,
     address: o.address,
     category: o.category,
@@ -246,21 +248,24 @@ function mk(o: SeedOpts): Report {
 export function seedReports(): Report[] {
   return [
     mk({
-      num: 111, x: 598, y: 520, address: "у Центрального парка, вход №2",
+      num: 111, lat: 55.7868, lng: 49.1392,
+      address: "сквер у парка Горького, вход со стороны ул. Ершова",
       category: "green",
-      description: "После опиловки деревьев всю кучу веток бросили у входа в парк, уже неделю разрастается, мешает проходу колясок.",
+      description: "После опиловки деревьев всю кучу веток бросили у входа в парк Горького, уже неделю разрастается, мешает проходу колясок.",
       status: "new", author: "Олег Ткачёв", createdAt: at(0, 5),
       photoBefore: IMG.branches,
     }),
     mk({
-      num: 109, x: 118, y: 586, address: "Объездное шоссе, 3-й км",
+      num: 109, lat: 55.718, lng: 49.178,
+      address: "Оренбургский тракт, 3-й км, обочина",
       category: "tires",
-      description: "На обочине вывалена гора покрышек, примерно 40–50 штук, видны следы грузовика. Рядом водосток в реку.",
+      description: "На обочине вывалена гора покрышек, примерно 40–50 штук, видны следы грузовика. Рядом водосток, всё потечёт в овраг.",
       status: "new", author: "В. Астахов", createdAt: at(0, 3),
       photoBefore: IMG.tires,
     }),
     mk({
-      num: 103, x: 262, y: 232, address: "промзона, тупик Механический",
+      num: 103, lat: 55.846, lng: 49.062,
+      address: "промзона, ул. Васильченко, тупик",
       category: "tires",
       description: "За гаражами кто-то складировал старые шины и масляные канистры. Летом это будет сильно пахнуть, прошу убрать.",
       status: "new", author: "Мария Ковалёва", createdAt: at(1, 2),
@@ -268,14 +273,16 @@ export function seedReports(): Report[] {
       comments: [cm(at(0, 20), "Мария Ковалёва", "resident", "Добавлю: сегодня видел, как подъезжала «Газель» и что-то докладывала.")],
     }),
     mk({
-      num: 106, x: 762, y: 362, address: "берег Быстрицы, у лодочной станции",
+      num: 106, lat: 55.81, lng: 49.123,
+      address: "берег Казанки, у лодочной станции",
       category: "hazard",
-      description: "На берегу лежит ржавый металлический лом и старый холодильник, при половодье всё это окажется в воде. Требуется срочный вывоз.",
+      description: "На берегу Казанки лежит ржавый металлический лом и старый холодильник — весной при половодье всё это окажется в воде. Требуется срочный вывоз.",
       status: "new", author: "Елена Мороз", createdAt: at(2, 6),
       photoBefore: IMG.metal,
     }),
     mk({
-      num: 108, x: 562, y: 392, address: "пустырь за рынком «Центральный»",
+      num: 108, lat: 55.783, lng: 49.108,
+      address: "пустырь за ТЦ «Кольцо», ул. Московская",
       category: "construction",
       description: "После ремонта магазинов на пустырь свезли бой кирпича, мешки со штукатуркой и обрезки гипсокартона. Объём растёт каждый день.",
       status: "work", author: "Игорь Ватутин", createdAt: at(4, 6),
@@ -286,7 +293,8 @@ export function seedReports(): Report[] {
       ],
     }),
     mk({
-      num: 105, x: 428, y: 118, address: "ул. Мира, лесополоса",
+      num: 105, lat: 55.799, lng: 49.183,
+      address: "лесополоса за ЖК «Светлая долина», ул. Академика Глушко",
       category: "green",
       description: "В лесополосе свалена большая куча спиленных веток и стволов, рядом детская тропа в школу. Просим измельчить и вывезти.",
       status: "work", author: "Анна Литвинова", createdAt: at(6, 5),
@@ -297,7 +305,8 @@ export function seedReports(): Report[] {
       ],
     }),
     mk({
-      num: 102, x: 330, y: 598, address: "ГСК «Юг», вдоль гаражей",
+      num: 102, lat: 55.741, lng: 49.146,
+      address: "ГСК «Юг», ул. Техническая, вдоль гаражей",
       category: "house",
       description: "Вдоль гаражей рассыпан бытовой мусор: пакеты, коробки, остатки еды. Разносят собаки и птицы, запах на весь двор.",
       status: "work", author: "Д. Смирнов", createdAt: at(9, 4),
@@ -308,16 +317,18 @@ export function seedReports(): Report[] {
       ],
     }),
     mk({
-      num: 107, x: 852, y: 298, address: "ул. Заречная, 5",
+      num: 107, lat: 55.815, lng: 49.133,
+      address: "ул. Чистопольская, 61, газон",
       category: "house",
-      description: "Якобы у дома №5 куча мусора на газоне.",
+      description: "Якобы у дома №61 куча мусора на газоне.",
       status: "rejected", author: "аноним", createdAt: at(15, 2),
       rejectedAt: at(14, 1),
       rejectReason: "При осмотре факт не подтвердился: территория чистая, заявка отклонена.",
       photoBefore: IMG.mixed,
     }),
     mk({
-      num: 104, x: 505, y: 458, address: "пр-т Ленина, 42, двор",
+      num: 104, lat: 55.824, lng: 49.117,
+      address: "пр-т Ямашева, 42, двор",
       category: "house",
       description: "Контейнерная площадка переполнена, мусор лежит вокруг баков уже неделю, УК не реагирует на обращения.",
       status: "done", author: "Наталья Юдина", createdAt: at(19, 7),
@@ -329,7 +340,8 @@ export function seedReports(): Report[] {
       ],
     }),
     mk({
-      num: 101, x: 150, y: 300, address: "ул. Заводская, 14, пустырь",
+      num: 101, lat: 55.852, lng: 49.072,
+      address: "ул. Лушникова, 14, пустырь",
       category: "construction",
       description: "На пустыре у заброшенного цеха вывалена телега строительного мусора: кирпич, доски, куски обоев. Свалка растёт.",
       status: "done", author: "П. Гордеев", createdAt: at(26, 3),
@@ -342,7 +354,8 @@ export function seedReports(): Report[] {
       ],
     }),
     mk({
-      num: 110, x: 472, y: 252, address: "ул. Первомайская, 8",
+      num: 110, lat: 55.79, lng: 49.118,
+      address: "ул. Профсоюзная, 8, за домом",
       category: "other",
       description: "За домом кто-то выгрузил старую мебель и ковры, всё промокло под дождём и превратилось в свалку.",
       status: "done", author: "С. Крылов", createdAt: at(32, 1),

@@ -28,8 +28,8 @@ export interface CommentT {
 export interface Report {
   id: string;
   num: number;
-  x: number;
-  y: number;
+  lat: number;
+  lng: number;
   district: string;
   address: string;
   category: CategoryId;

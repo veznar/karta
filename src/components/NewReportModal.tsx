@@ -4,15 +4,15 @@ import { CATEGORIES } from "../data";
 import { CategoryGlyph, Icon } from "./Icons";
 
 export default function NewReportModal({
-  x,
-  y,
+  lat,
+  lng,
   district,
   nextNum,
   onClose,
   onSubmit,
 }: {
-  x: number;
-  y: number;
+  lat: number;
+  lng: number;
   district: string;
   nextNum: number;
   onClose: () => void;
@@ -58,7 +58,7 @@ export default function NewReportModal({
           <div className="flex flex-wrap items-center gap-2 rounded-lg border border-leaf-500/30 bg-leaf-100/60 px-3 py-2.5">
             <Icon name="target" className="w-4 h-4 text-leaf-700" />
             <span className="font-mono text-[11px] font-bold text-leaf-700">
-              X {Math.round(x)} · Y {Math.round(y)}
+              {lat.toFixed(5)} с.ш. · {lng.toFixed(5)} в.д.
             </span>
             <span className="text-[11.5px] font-semibold text-ink-700">
               район определён автоматически: <b>{district}</b>
